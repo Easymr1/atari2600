@@ -56,7 +56,7 @@ StartFrame:
         sta PF0
         sta PF1
         sta PF2
-	REPEAT 7
+	    REPEAT 7
         	sta WSYNC
         REPEND
         
@@ -72,11 +72,12 @@ StartFrame:
         	sta WSYNC
         REPEND
         
-        lda #%00100000
+        lda #%01100000
         sta PF0
-        ldx #0
-        stx PF1
-        stx PF2
+        lda #%00000000
+        sta PF1
+        lda #%10000000
+        sta PF2
        	REPEAT 164
         	sta WSYNC
         REPEND
