@@ -43,11 +43,13 @@ INTIM                    0284
 NumberBitMap             fff2              (R )
 NUSIZ0                   0004                  
 NUSIZ1                   0005                  
+P0Height                 0080              (R )
+P1Height                 0081              (R )
 PF0                      000d                  
 PF1                      000e              (R )
 PF2                      000f                  
-Player0Loop              f10d              (R )
-Player1Loop              f11f              (R )
+Player0Loop              f113              (R )
+Player1Loop              f125              (R )
 PlayerBitMap             ffe8              (R )
 REFP0                    000b                  
 REFP1                    000c                  
@@ -60,8 +62,8 @@ RESMP1                   0029
 RESP0                    0010                  
 RESP1                    0011                  
 RSYNC                    0003                  
-ScoreBoardLoop           f097              (R )
-StartFrame               f013              (R )
+ScoreBoardLoop           f09d              (R )
+StartFrame               f019              (R )
 SWACNT                   0281                  
 SWBCNT                   0283                  
 SWCHA                    0280                  
@@ -80,7 +82,7 @@ VDELP0                   0025
 VDELP1                   0026                  
 VERSION_MACRO            006a                  
 VERSION_VCS              0069                  
-VisibleScanlines         f081                  
+VisibleScanlines         f087                  
 VSYNC                    0000              (R )
 WSYNC                    0002              (R )
 --- End of Symbol List.
