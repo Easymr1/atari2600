@@ -372,7 +372,7 @@
 ------- FILE screenobject.asm
       5  10000 ????
       6  10000 ????						;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      7  10000 ????						;; Start an unitialized segment at $80 for variable declaration
+      7  10000 ????						;; Start an unitialized segment at $80 for RAM variable
       8  10000 ????						;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
       9 U0082 ????				      seg.u	variable
      10 U0080					      org	$80
@@ -1027,7 +1027,7 @@
     196  fffb		       0e		      .byte.b	#%00001110	; ########
     197  fffc
     198  fffc							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    199  fffc							;; Epilogue
+    199  fffc							;; Complete ROM size with exactly 4kB
     200  fffc							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     201  fffc
     202  fffc					      org	$fffc
