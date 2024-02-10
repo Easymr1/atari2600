@@ -4,7 +4,7 @@
         include "macro.h"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Start an unitialized segment at $80 for variable declaration 
+;; Start an unitialized segment at $80 for RAM variable 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     seg.u variable
     org $80
@@ -196,7 +196,7 @@ NumberBitMap:
     .byte #%00001110      ; ########
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Epilogue
+;; Complete ROM size with exactly 4kB
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	org $fffc
