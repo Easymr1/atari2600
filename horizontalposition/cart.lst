@@ -422,7 +422,7 @@
      30  f00f							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
      31  f00f							;; Initialize variables
      32  f00f							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     33  f00f		       a9 32		      lda	#50
+     33  f00f		       a9 28		      lda	#40
      34  f011		       85 80		      sta	P0XPos	; initialize player X coordinate
      35  f013
      36  f013							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -675,12 +675,12 @@
      93  f0fe		       85 02		      sta	WSYNC	; wait for 60 empty scanlines
      94  f100					      REPEND
      95  f100
-     96  f100		       a4 08		      ldy	8	; counter to draw 8 rows of bitmap
+     96  f100		       a0 08		      ldy	#8	; counter to draw 8 rows of bitmap
      97  f102				   DrawBitmap
-     98  f102		       b9 52 f2 	      lda	P0Bitmap,Y	; load player bitmap slice of data
+     98  f102		       b9 5c f2 	      lda	P0Bitmap,Y	; load player bitmap slice of data
      99  f105		       85 1b		      sta	GRP0	; set graphics for player 0 slice
     100  f107
-    101  f107		       b9 5b f2 	      lda	P0Color,Y	; load player color from lookup table
+    101  f107		       b9 65 f2 	      lda	P0Color,Y	; load player color from lookup table
     102  f10a		       85 06		      sta	COLUP0	; set color for player 0 slice
     103  f10c
     104  f10c		       85 02		      sta	WSYNC	; wait for next scanline
@@ -1010,46 +1010,56 @@
     124  f24d					      REPEND
     125  f24d
     126  f24d							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    127  f24d							;; Increment X coordinate before next frame for animation.
+    127  f24d							;; Validate if Player 0 position is greater then ...
     128  f24d							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    129  f24d		       e6 80		      inc	P0XPos
-    130  f24f
-    131  f24f							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    132  f24f							;; Loop to next frame
-    133  f24f							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    134  f24f		       4c 13 f0 	      jmp	StartFrame
-    135  f252
-    136  f252							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    137  f252							;; Lookup table for the player graphics bitmap.
-    138  f252							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    139  f252				   P0Bitmap
-    140  f252		       00		      byte.b	#%00000000
-    141  f253		       10		      byte.b	#%00010000
-    142  f254		       08		      byte.b	#%00001000
-    143  f255		       1c		      byte.b	#%00011100
-    144  f256		       36		      byte.b	#%00110110
-    145  f257		       2e		      byte.b	#%00101110
-    146  f258		       2e		      byte.b	#%00101110
-    147  f259		       3e		      byte.b	#%00111110
-    148  f25a		       1c		      byte.b	#%00011100
-    149  f25b
-    150  f25b							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    151  f25b							;; Lookup table for the player colors.
-    152  f25b							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    153  f25b				   P0Color
-    154  f25b		       00		      byte.b	#$00
-    155  f25c		       02		      byte.b	#$02
-    156  f25d		       02		      byte.b	#$02
-    157  f25e		       52		      byte.b	#$52
-    158  f25f		       52		      byte.b	#$52
-    159  f260		       52		      byte.b	#$52
-    160  f261		       52		      byte.b	#$52
-    161  f262		       52		      byte.b	#$52
-    162  f263		       52		      byte.b	#$52
-    163  f264
-    164  f264							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    165  f264							;; Complete ROM size
-    166  f264							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    167  fffc					      org	$FFFC
-    168  fffc		       00 f0		      word.w	Reset
-    169  fffe		       00 f0		      word.w	Reset
+    129  f24d		       a5 80		      lda	P0XPos
+    130  f24f		       c9 50		      cmp	#80
+    131  f251		       90 04		      bcc	SkipReset
+    132  f253		       a9 27		      lda	#39
+    133  f255		       85 80		      sta	P0XPos
+    134  f257
+    135  f257				   SkipReset
+    136  f257							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    137  f257							;; Increment X coordinate before next frame for animation.
+    138  f257							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    139  f257		       e6 80		      inc	P0XPos
+    140  f259
+    141  f259							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    142  f259							;; Loop to next frame
+    143  f259							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    144  f259		       4c 13 f0 	      jmp	StartFrame
+    145  f25c
+    146  f25c							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    147  f25c							;; Lookup table for the player graphics bitmap.
+    148  f25c							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    149  f25c				   P0Bitmap
+    150  f25c		       00		      byte.b	#%00000000
+    151  f25d		       10		      byte.b	#%00010000
+    152  f25e		       08		      byte.b	#%00001000
+    153  f25f		       1c		      byte.b	#%00011100
+    154  f260		       36		      byte.b	#%00110110
+    155  f261		       2e		      byte.b	#%00101110
+    156  f262		       2e		      byte.b	#%00101110
+    157  f263		       3e		      byte.b	#%00111110
+    158  f264		       1c		      byte.b	#%00011100
+    159  f265
+    160  f265							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    161  f265							;; Lookup table for the player colors.
+    162  f265							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    163  f265				   P0Color
+    164  f265		       00		      byte.b	#$00
+    165  f266		       02		      byte.b	#$02
+    166  f267		       02		      byte.b	#$02
+    167  f268		       52		      byte.b	#$52
+    168  f269		       52		      byte.b	#$52
+    169  f26a		       52		      byte.b	#$52
+    170  f26b		       52		      byte.b	#$52
+    171  f26c		       52		      byte.b	#$52
+    172  f26d		       52		      byte.b	#$52
+    173  f26e
+    174  f26e							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    175  f26e							;; Complete ROM size
+    176  f26e							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    177  fffc					      org	$FFFC
+    178  fffc		       00 f0		      word.w	Reset
+    179  fffe		       00 f0		      word.w	Reset

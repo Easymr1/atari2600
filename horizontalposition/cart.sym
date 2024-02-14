@@ -45,8 +45,8 @@ INTIM                    0284
 NUSIZ0                   0004                  
 NUSIZ1                   0005                  
 Overscan                 f20d                  
-P0Bitmap                 f252              (R )
-P0Color                  f25b              (R )
+P0Bitmap                 f25c              (R )
+P0Color                  f265              (R )
 P0XPos                   0080              (R )
 PF0                      000d                  
 PF1                      000e                  
@@ -62,6 +62,7 @@ RESMP1                   0029
 RESP0                    0010              (R )
 RESP1                    0011                  
 RSYNC                    0003                  
+SkipReset                f257              (R )
 StartFrame               f013              (R )
 SWACNT                   0281                  
 SWBCNT                   0283                  

@@ -30,7 +30,7 @@ Reset:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize variables
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    lda #50
+    lda #40
     sta P0XPos     ; initialize player X coordinate
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -93,7 +93,7 @@ DivideLoop:
         sta WSYNC  ; wait for 60 empty scanlines
     REPEND
 
-    ldy 8          ; counter to draw 8 rows of bitmap
+    ldy #8          ; counter to draw 8 rows of bitmap
 DrawBitmap:
     lda P0Bitmap,Y ; load player bitmap slice of data
     sta GRP0       ; set graphics for player 0 slice
@@ -123,6 +123,16 @@ Overscan:
         sta WSYNC
     REPEND
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Validate if Player 0 position is greater then ...
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    lda P0XPos
+    cmp #80
+    bcc SkipReset
+    lda #39
+    sta P0XPos
+
+SkipReset:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Increment X coordinate before next frame for animation.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
