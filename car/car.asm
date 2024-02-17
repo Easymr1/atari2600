@@ -11,8 +11,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     seg.u Variables
     org $80
-CarY byte
-CarHeight    byte
+CarY            byte
+CarX            byte
+CarHeight       byte
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Start our ROM code segment starting at $F000.
@@ -35,6 +36,9 @@ Reset:
     lda #180
     sta CarY
 
+    lda #60
+    sta CarX
+
     lda #9
     sta CarHeight
 
@@ -56,9 +60,36 @@ StartFrame:
     sta VSYNC
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Calcule CarX Position
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    lda CarX
+    and #$7F       ; same as AND 01111111, forces bit 7 to zero
+                   ; keeping the value inside A always positive
+
+    sec            ; set carry flag before subtraction
+
+    sta WSYNC      ; wait for next scanline
+    sta HMCLR      ; clear old horizontal position values
+
+DivideLoop:
+    sbc #15        ; Subtract 15 from A
+    bcs DivideLoop ; loop while carry flag is still set
+
+    eor #7         ; adjust the remainder in A between -8 and 7
+    asl            ; shift left by 4, as HMP0 uses only 4 bits
+    asl
+    asl
+    asl
+    sta HMP0       ; set fine position value
+    sta RESP0      ; reset rough position
+    sta WSYNC      ; wait for next scanline
+    sta HMOVE      ; apply the fine position offset
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Display 37 vertical lines of VBLANK
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    REPEAT 37
+    REPEAT 35
         sta WSYNC
     REPEND
     lda #0
@@ -132,13 +163,13 @@ CarLeft:
     lda #%01000000
     bit SWCHA
     bne CarRight
-    inc CarY
+    dec CarX
 
 CarRight:
     lda #%10000000
     bit SWCHA
     bne EndInputCheck
-    dec CarY
+    inc CarX
 
 EndInputCheck:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
