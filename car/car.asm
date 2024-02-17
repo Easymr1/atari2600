@@ -94,10 +94,10 @@ Scanline:
 
 DrawBitMap:
     tay
-    lda Player0Sprite,Y     ; load player bitmap slice data
+    lda CarSprite,Y     ; load player bitmap slice data
     sta WSYNC               ; wait for next scanline
     sta GRP0                ; set graphics player 0 slice
-    lda ColorPlayer0,Y      ; load player color from lookup table
+    lda CarColor,Y      ; load player color from lookup table
     sta COLUP0              ; set color player 0 slice
 
     dex                     ; X--
@@ -149,18 +149,18 @@ EndInputCheck:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Declare ROM lookup tables
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Player0Sprite
+CarSprite
     .byte #%00000000;$82
-    .byte #%00011000;$82
-    .byte #%00011000;$00
-    .byte #%00011000;$82
-    .byte #%00011000;$82
-    .byte #%00011000;$82
-    .byte #%00011000;$00
-    .byte #%00011000;$00
-    .byte #%00011000;$82
+    .byte #%00111000;$82
+    .byte #%00111000;$00
+    .byte #%00111000;$82
+    .byte #%00111000;$82
+    .byte #%00111000;$82
+    .byte #%00111000;$00
+    .byte #%00111000;$00
+    .byte #%00111000;$82
 
-ColorPlayer0
+CarColor
     .byte #$82;
     .byte #$00;
     .byte #$82;
