@@ -11,9 +11,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     seg.u Variables
     org $80
-CarY            byte
-CarX            byte
-CarHeight       byte
+CarY            	byte
+CarX            	byte
+CarHeight       	byte
+CarSpritePointer	word
+CarAnimationOffset	byte
+
+HumanX			byte
+HumanY			byte
+HumanHeight		byte
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Start our ROM code segment starting at $F000.
@@ -33,7 +39,7 @@ Reset:
     lda #$C4
     sta COLUPF
 
-    lda #180
+    lda #10
     sta CarY
 
     lda #60
@@ -41,6 +47,24 @@ Reset:
 
     lda #9
     sta CarHeight
+    
+    lda #60
+    sta HumanY
+
+    lda #40
+    sta HumanX
+    
+    lda #15
+    sta HumanHeight
+
+    
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Car sprite pointer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	lda #<CarSprite
+        sta CarSpritePointer
+        lda #>CarSprite
+        sta CarSpritePointer + 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Start a new frame by configuring VBLANK and VSYNC
@@ -89,7 +113,7 @@ DivideLoop:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Display 37 vertical lines of VBLANK
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    REPEAT 35
+    REPEAT 37
         sta WSYNC
     REPEND
     lda #0
@@ -120,19 +144,46 @@ Scanline:
     sec
     sbc CarY
     cmp CarHeight
-    bcc DrawBitMap          ; if result < SpriteHeight, call subroutine
-    lda #0                  ; else, set index to 0
+    bcc DrawBitMap          	; if result < SpriteHeight, call subroutine
+    lda #0                  	; else, set index to 0
 
+	sta WSYNC 
 DrawBitMap:
+    clc
+    adc CarAnimationOffset
     tay
-    lda CarSprite,Y     ; load player bitmap slice data
-    sta WSYNC               ; wait for next scanline
-    sta GRP0                ; set graphics player 0 slice
-    lda CarColor,Y      ; load player color from lookup table
-    sta COLUP0              ; set color player 0 slice
+    lda (CarSpritePointer),Y    ; load player bitmap slice data
+    ;sta WSYNC              	; wait for next scanline
+    sta GRP0                	; set graphics player 0 slice
+    lda CarColor,Y      	; load player color from lookup table
+    sta COLUP0              	; set color player 0 slice
 
-    dex                     ; X--
-    bne Scanline            ; repeat next scanline until finished
+
+DrawHuman
+    txa
+    sec
+    sbc HumanY
+    cmp HumanHeight
+    bcc DrawHumanSprite
+    lda #0
+    
+
+DrawHumanSprite:
+    tay
+    lda Human,Y    ; load player bitmap slice data
+    ;sta WSYNC              	; wait for next scanline
+    sta GRP1                	; set graphics player 0 slice
+    lda HumanColor,Y      	; load player color from lookup table
+    sta COLUP1            	; set color player 0 slice
+
+
+
+    dex                     	; X--
+    bne Scanline            	; repeat next scanline until finished
+    
+    
+    lda #0
+    sta CarAnimationOffset
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Display 30 vertical lines of VBLANK
@@ -147,31 +198,41 @@ DrawBitMap:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Controle Joystique Car
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 CarUp:
     lda #%00010000
     bit SWCHA
     bne CarDown
     inc CarY
+    lda CarHeight
+    sta CarAnimationOffset
 
 CarDown:
     lda #%00100000
     bit SWCHA
     bne CarLeft
     dec CarY
-
+    lda CarHeight
+    sta CarAnimationOffset
+    
 CarLeft:
     lda #%01000000
     bit SWCHA
     bne CarRight
     dec CarX
+    lda #0
+    sta CarAnimationOffset
 
 CarRight:
     lda #%10000000
     bit SWCHA
     bne EndInputCheck
     inc CarX
+    lda #0
+    sta CarAnimationOffset
 
 EndInputCheck:
+        
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Loop back to start a brand new frame
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -190,6 +251,34 @@ CarSprite
     .byte #%00111000;$00
     .byte #%00111000;$00
     .byte #%00111000;$82
+    
+CarTrasnformation
+    .byte #%00000000;--
+    .byte #%10100101;--
+    .byte #%10100101;--
+    .byte #%11111111;--
+    .byte #%00111100;--
+    .byte #%11011011;--
+    .byte #%10011001;--
+    .byte #%10011001;--
+    .byte #%11111111;--
+
+Human
+    .byte #%00000000;$44
+    .byte #%00111100;$44
+    .byte #%00101000;$00
+    .byte #%00101000;$00
+    .byte #%00101000;$00
+    .byte #%00111000;$00
+    .byte #%10111010;$84
+    .byte #%10111010;$84
+    .byte #%10111010;$84
+    .byte #%11111110;$84
+    .byte #%00110000;$84
+    .byte #%00111000;$F2
+    .byte #%00111000;$F2
+    .byte #%00111100;$44
+    .byte #%00111000;$44
 
 CarColor
     .byte #$82;
@@ -201,6 +290,33 @@ CarColor
     .byte #$00;
     .byte #$82;
     .byte #$82;
+CarColor2
+    .byte #$82;
+    .byte #$00;
+    .byte #$82;
+    .byte #$82;
+    .byte #$82;
+    .byte #$00;
+    .byte #$00;
+    .byte #$82;
+	.byte #$82;
+
+HumanColor
+    .byte #$44;
+    .byte #$44;
+    .byte #$00;
+    .byte #$00;
+    .byte #$00;
+    .byte #$00;
+    .byte #$84;
+    .byte #$84;
+    .byte #$84;
+    .byte #$84;
+    .byte #$84;
+    .byte #$F2;
+    .byte #$F2;
+    .byte #$44;
+    .byte #$44;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Complete ROM size with exactly 4KB
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
